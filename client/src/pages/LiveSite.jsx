@@ -19,7 +19,7 @@ function LiveSite() {
           }
         );
 
-        setHtml(result.data.latestCode);
+        setHtml(result.data.latestCode || "");
       } catch (err) {
         console.log(err);
         setError("Site not found");

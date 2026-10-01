@@ -21,11 +21,13 @@ function Dashboard() {
         withCredentials: true,
       });
       window.open(`${result.data.url}`, "_blank");
-      setWebsites((prev)=>prev.map((w)=>{
-        w._id === id
-        ? {...w, deployed:true, deployUrl:result.data.url}
-        : w
-      }))
+      setWebsites((prev) =>
+        (prev || []).map((w) =>
+          w._id === id
+            ? { ...w, deployed: true, deployUrl: result.data.url }
+            : w
+        )
+      )
     } catch (error) {
       console.log(error);
     }
@@ -206,7 +208,7 @@ function Dashboard() {
                     {/* OPEN EDITOR */}
 
                     <button
-                      onClick={() => navigate(`/editor/${w._id}`)}
+                      onClick={(e) => { e.stopPropagation(); navigate(`/editor/${w._id}`); }}
                       className="absolute right-3 top-3 flex h-9 w-9 items-center justify-center rounded-lg bg-black/70 text-white opacity-0 backdrop-blur-sm transition group-hover:opacity-100"
                     >
                       <ExternalLink size={15} />
@@ -233,7 +235,7 @@ function Dashboard() {
                       {!w.deployed ? (
                         <button
                           className="flex w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-purple-500 to-blue-500 px-4 py-2.5 text-sm font-medium text-white transition hover:opacity-90"
-                          onClick={() => handleDeploy(w._id)}
+                          onClick={(e) => { e.stopPropagation(); handleDeploy(w._id); }}
                         >
                           <Rocket size={15} />
                           Deploy
@@ -241,7 +243,7 @@ function Dashboard() {
                       ) : (
                         <motion.button
                           className="flex w-full items-center justify-center gap-2 rounded-xl border border-white/10 bg-white/5 px-4 py-2.5 text-sm font-medium text-gray-300 transition hover:bg-white/10 hover:text-white"
-                          onClick={() => handleCopy(w)}
+                          onClick={(e) => { e.stopPropagation(); handleCopy(w); }}
                         >
                           {copied ? (
                             <>

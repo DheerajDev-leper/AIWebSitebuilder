@@ -275,9 +275,15 @@ function Home() {
             }}
             whileTap={{ scale: 0.95 }}
             className="rounded-full bg-gradient-to-r from-purple-500 to-blue-500 px-8 py-4 font-semibold shadow-lg shadow-purple-500/20"
-            onClick={() => navigate("/dashboard")}
+            onClick={() => {
+              if (userData) {
+                navigate("/dashboard");
+              } else {
+                setOpenLogin(true);
+              }
+            }}
           >
-            {userData?"Go to dashboard":"Get Started"}
+            {userData ? "Go to dashboard" : "Get Started"}
           </motion.button>
         </motion.div>
 

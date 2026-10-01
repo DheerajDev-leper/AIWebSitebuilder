@@ -5,6 +5,8 @@ import { serverUrl } from "../App";
 import { Code2, Monitor, Rocket, MessageSquare, Send, X } from "lucide-react";
 import { AnimatePresence, motion } from "motion/react";
 import { Editor } from "@monaco-editor/react";
+import { useDispatch, useSelector } from "react-redux";
+import { setUserData } from "../redux/userSlice";
 
 function Header({ title, onclose }) {
   return (
@@ -80,6 +82,8 @@ function Chat({ message = [] }) {
 
 function WebsiteEditor() {
   const { id } = useParams();
+  const dispatch = useDispatch();
+  const { userData } = useSelector((state) => state.user);
 
   const [website, setWebsite] = useState(null);
   const [error, setError] = useState("");
@@ -133,12 +137,24 @@ function WebsiteEditor() {
       setMessage((m) => [
         ...m,
         {
-          role: "ai",
+          role: "assistant",
           content: result.data.message,
         },
       ]);
 
       setCode(result.data.code);
+
+      if (
+        userData &&
+        typeof result.data.remainingCredits === "number"
+      ) {
+        dispatch(
+          setUserData({
+            ...userData,
+            credits: result.data.remainingCredits,
+          })
+        );
+      }
 
       setPrompt("");
     } catch (error) {
@@ -147,7 +163,7 @@ function WebsiteEditor() {
       setMessage((m) => [
         ...m,
         {
-          role: "ai",
+          role: "assistant",
           content:
             error.response?.data?.message || "Failed to update the website.",
         },
@@ -203,7 +219,12 @@ function WebsiteEditor() {
       const result = await axios.get(`${serverUrl}/api/website/deploy/${website._id}`, {
         withCredentials: true,
       });
-      window.open(`${result.data.url}`, "_blank");
+      setWebsite((prev) =>
+        prev
+          ? { ...prev, deployed: true, deployUrl: result.data.url }
+          : prev
+      );
+      window.open(result.data.url, "_blank");
     } catch (error) {
       console.log(error);
     }

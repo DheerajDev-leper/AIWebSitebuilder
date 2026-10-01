@@ -4,6 +4,8 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { serverUrl } from "../App";
+import { useDispatch, useSelector } from "react-redux";
+import { setUserData } from "../redux/userSlice";
 
 const PHASES = [
   "Analyzing your idea..",
@@ -15,6 +17,8 @@ const PHASES = [
 
 function Generate() {
   const navigate = useNavigate();
+  const dispatch = useDispatch();
+  const { userData } = useSelector((state) => state.user);
 
   const [prompt, setPrompt] = useState("");
   const [loading, setLoading] = useState(false);
@@ -40,6 +44,17 @@ function Generate() {
       );
 
       console.log(result);
+
+      if (typeof result.data.remainingCredits === "number") {
+        if (userData) {
+          dispatch(
+            setUserData({
+              ...userData,
+              credits: result.data.remainingCredits,
+            })
+          );
+        }
+      }
 
       setProgress(100);
 
