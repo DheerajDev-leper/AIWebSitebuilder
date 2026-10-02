@@ -4,7 +4,7 @@ import { motion } from "motion/react";
 import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
-import { serverUrl } from "../App";
+import { serverUrl } from "../config";
 
 function Dashboard() {
   const { userData } = useSelector((state) => state.user);
@@ -12,15 +12,17 @@ function Dashboard() {
   const navigate = useNavigate();
 
   const [websites, setWebsites] = useState(null);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [copiedID, setCopiedId] = useState(null);
   const handleDeploy = async (id) => {
+    // open synchronously so Safari/mobile popup blockers allow it
+    const win = window.open("", "_blank");
     try {
       const result = await axios.get(`${serverUrl}/api/website/deploy/${id}`, {
         withCredentials: true,
       });
-      window.open(`${result.data.url}`, "_blank");
+      if (win) win.location.href = result.data.url;
       setWebsites((prev) =>
         (prev || []).map((w) =>
           w._id === id
@@ -30,6 +32,8 @@ function Dashboard() {
       )
     } catch (error) {
       console.log(error);
+      if (win) win.close();
+      alert(error.response?.data?.message || "Deployment failed. Please try again.");
     }
   };
 
@@ -70,7 +74,7 @@ function Dashboard() {
   };
 
   return (
-    <div className="min-h-screen bg-[#050505] text-white">
+    <div className="min-h-dvh bg-[#050505] text-white">
       {/* HEADER */}
 
       <div className="border-b border-white/10 bg-[#050505]/80 backdrop-blur-xl">
@@ -193,7 +197,10 @@ function Dashboard() {
                     delay: i * 0.08,
                   }}
                   className="group overflow-hidden rounded-2xl border border-white/10 bg-white/[0.03] transition hover:border-white/20 hover:bg-white/[0.05]"
+                  role="button"
+                  tabIndex={0}
                   onClick={()=>navigate(`/editor/${w._id}`)}
+                  onKeyDown={(e)=>{ if (e.target===e.currentTarget && (e.key==="Enter"||e.key===" ")) { e.preventDefault(); navigate(`/editor/${w._id}`); } }}
                 >
                   {/* WEBSITE PREVIEW */}
 
@@ -202,14 +209,15 @@ function Dashboard() {
                       srcDoc={w.latestCode}
                       title={w.title}
                       sandbox="allow-scripts allow-forms"
-                      className="h-full w-full border-0"
+                      className="pointer-events-none h-full w-full border-0"
                     />
 
                     {/* OPEN EDITOR */}
 
                     <button
                       onClick={(e) => { e.stopPropagation(); navigate(`/editor/${w._id}`); }}
-                      className="absolute right-3 top-3 flex h-9 w-9 items-center justify-center rounded-lg bg-black/70 text-white opacity-0 backdrop-blur-sm transition group-hover:opacity-100"
+                      aria-label="Open editor"
+                      className="absolute right-3 top-3 flex h-9 w-9 items-center justify-center rounded-lg bg-black/70 text-white opacity-100 backdrop-blur-sm transition sm:opacity-0 sm:group-hover:opacity-100 focus-visible:opacity-100"
                     >
                       <ExternalLink size={15} />
                     </button>

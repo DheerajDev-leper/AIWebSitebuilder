@@ -5,7 +5,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { Coins } from "lucide-react";
 import { useState } from "react";
 
-import { serverUrl } from "../App";
+import { serverUrl } from "../config";
 import axios from "axios";
 import { setUserData } from "../redux/userSlice";
 import { useNavigate } from "react-router-dom";
@@ -64,7 +64,7 @@ function Home() {
     }
   };
   return (
-    <div className="min-h-screen overflow-hidden bg-[#050505] text-white">
+    <div className="min-h-dvh overflow-hidden bg-[#050505] text-white">
 
       {/* Background */}
       <div className="fixed inset-0 -z-10 overflow-hidden">
@@ -114,7 +114,7 @@ function Home() {
 
           <motion.div
             whileHover={{ y: -2 }}
-            className="hidden cursor-pointer text-sm text-gray-400 transition hover:text-white sm:block"
+            className="cursor-pointer text-sm text-gray-400 transition hover:text-white"
           onClick={()=>navigate("/pricing")}
           >
             Pricing
@@ -135,7 +135,7 @@ function Home() {
                 {userData.credits}
               </span>
 
-              <span className="flex h-5 w-5 items-center justify-center rounded-full bg-purple-500 text-xs font-bold" onClick={()=>navigate("/pricing")}>
+              <span className="flex h-5 w-5 items-center justify-center cursor-pointer rounded-full bg-purple-500 text-xs font-bold" onClick={()=>navigate("/pricing")}>
                 +
               </span>
             </motion.div>
@@ -376,12 +376,7 @@ function Home() {
       </footer>
 
       {/* Login Modal */}
-      {openLogin && (
-        <LoginModel
-          open={openLogin}
-          onClose={() => setOpenLogin(false)}
-        />
-      )}
+      <LoginModel open={openLogin} onClose={() => setOpenLogin(false)} />
 
     </div>
   );

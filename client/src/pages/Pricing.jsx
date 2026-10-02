@@ -1,7 +1,7 @@
 import { Check, ArrowLeft, Sparkles } from "lucide-react";
 import { motion } from "motion/react";
 import { useNavigate } from "react-router-dom";
-import { serverUrl } from "../App";
+import { serverUrl } from "../config";
 import axios from "axios";
 import { useDispatch } from "react-redux";
 import { setUserData } from "../redux/userSlice";
@@ -71,6 +71,8 @@ const [success, setSuccess] = useState("");
 const [error, setError] = useState("");
 
 const handleBuyCredits = async (plan) => {
+  if (buyingPlan) return;
+  if (!userData) { navigate("/"); return; }
   setBuyingPlan(plan);
   setSuccess("");
   setError("");
@@ -92,7 +94,7 @@ const handleBuyCredits = async (plan) => {
 
     setSuccess(`${result.data.message}. Your balance is now ${result.data.credits} credits.`);
 
-    setTimeout(() => navigate("/"), 1000);
+    setTimeout(() => navigate("/"), 1200);
   } catch (error) {
     console.log(error);
     setError(
@@ -105,7 +107,7 @@ const handleBuyCredits = async (plan) => {
 };
 
   return (
-    <div className="min-h-screen bg-[#050505] text-white">
+    <div className="min-h-dvh bg-[#050505] text-white">
       {/* Background */}
       <div className="pointer-events-none fixed inset-0 overflow-hidden">
         <div className="absolute left-1/2 top-[-300px] h-[600px] w-[600px] -translate-x-1/2 rounded-full bg-purple-600/20 blur-[140px]" />

@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import axios from "axios";
-import { serverUrl } from "../App";
+import { serverUrl } from "../config";
 
 function LiveSite() {
   const { id } = useParams();
@@ -34,7 +34,7 @@ function LiveSite() {
       <div
         style={{
           width: "100%",
-          height: "100vh",
+          height: "100dvh",
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
@@ -53,7 +53,7 @@ function LiveSite() {
       sandbox="allow-scripts allow-forms"
       style={{
         width: "100%",
-        height: "100vh",
+        height: "100dvh",
         border: "none",
         display: "block",
       }}

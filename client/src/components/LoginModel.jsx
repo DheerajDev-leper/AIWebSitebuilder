@@ -1,18 +1,24 @@
 import { AnimatePresence, motion } from "motion/react";
+import { useState } from "react";
 import logo from "../assets/logo.png";
 import { signInWithPopup } from "firebase/auth";
 import { auth,provider } from "../../firebase";
 import axios from "axios";
-import { serverUrl } from "../App";
+import { serverUrl } from "../config";
 import { useDispatch } from "react-redux";
 import { setUserData } from "../redux/userSlice";
 
 function LoginModel({ open, onClose }) {
 
   const dispatch = useDispatch()
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState("")
     const handleGoogleAuth = async () => {
 
         try {
+            if (loading) return
+            setLoading(true)
+            setError("")
             const result = await signInWithPopup(auth,provider)
             const {data} = await axios.post(`${serverUrl}/api/auth/google`,{
                 name:result.user.displayName,
@@ -20,9 +26,12 @@ function LoginModel({ open, onClose }) {
                 avatar:result.user.photoURL
             },{withCredentials:true})
             dispatch(setUserData(data.user));
+            setLoading(false)
             onClose()
         } catch (error) {
             console.log(error)
+            setLoading(false)
+            if (error?.code !== "auth/popup-closed-by-user") setError("Sign-in failed. Please try again.")
         }
         
     }
@@ -73,6 +82,7 @@ function LoginModel({ open, onClose }) {
             {/* Close button */}
             <button
               onClick={onClose}
+              aria-label="Close"
               className="absolute right-5 top-5 z-10 text-xl text-gray-500 transition hover:text-white"
             >
               ×
@@ -99,6 +109,7 @@ function LoginModel({ open, onClose }) {
                 whileTap={{ scale: 0.97 }}
                 className="mt-8 flex w-full items-center justify-center gap-3 rounded-xl bg-white px-5 py-3.5 font-medium text-black transition hover:bg-gray-200"
                 onClick={handleGoogleAuth}
+                disabled={loading}
               >
                 <img
                   src={logo}
@@ -106,8 +117,10 @@ function LoginModel({ open, onClose }) {
                   className="h-5 w-5"
                 />
 
-                Continue with Google
+                {loading ? "Signing in..." : "Continue with Google"}
               </motion.button>
+
+              {error && <p role="alert" className="mt-3 text-sm text-red-400">{error}</p>}
 
               {/* Secure login */}
               <div className="mt-6">

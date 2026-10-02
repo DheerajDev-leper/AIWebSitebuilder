@@ -1,8 +1,11 @@
 const openRouterUrl = "https://openrouter.ai/api/v1/chat/completions";
 
 const MODELS = [
+    "google/gemma-4-31b-it:free",
+    "google/gemma-4-26b-a4b-it:free",
+    "qwen/qwen3.8-27b:free",
     "poolside/laguna-xs-2.1:free",
-    "qwen/qwen3.8-27b:free",   // fallback 1
+       // fallback 1
     "openrouter/free",          // fallback 2, last resort
 ];
 

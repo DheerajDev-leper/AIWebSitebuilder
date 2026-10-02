@@ -1,44 +1,33 @@
-import { useEffect, useState } from "react"
-import axios from "axios"
-import { serverUrl } from "../App"
-import { useDispatch } from "react-redux"
-import { setUserData } from "../redux/userSlice"
+import { useEffect, useState } from "react";
+import axios from "axios";
+import { useDispatch } from "react-redux";
+import { serverUrl } from "../config";
+import { setUserData } from "../redux/userSlice";
 
-function GetCurrentUser() {
-    const dispatch = useDispatch()
-    const [loading, setLoading] = useState(true)
+// Fetches the logged-in user once on app start. Returns `loading` so routes can wait.
+function useCurrentUser() {
+  const dispatch = useDispatch();
+  const [loading, setLoading] = useState(true);
 
-    useEffect(() => {
-        let mounted = true
+  useEffect(() => {
+    const controller = new AbortController();
+    (async () => {
+      try {
+        const { data } = await axios.get(`${serverUrl}/api/user/me`, {
+          withCredentials: true,
+          signal: controller.signal,
+        });
+        dispatch(setUserData(data));
+      } catch (err) {
+        if (!axios.isCancel(err)) dispatch(setUserData(null));
+      } finally {
+        if (!controller.signal.aborted) setLoading(false);
+      }
+    })();
+    return () => controller.abort();
+  }, [dispatch]);
 
-        const getCurrentUser = async () => {
-            try {
-                const result = await axios.get(`${serverUrl}/api/user/me`, {
-                    withCredentials: true,
-                })
-
-                if (mounted) {
-                    dispatch(setUserData(result.data))
-                }
-            } catch (error) {
-                if (mounted) {
-                    dispatch(setUserData(null))
-                }
-            } finally {
-                if (mounted) {
-                    setLoading(false)
-                }
-            }
-        }
-
-        getCurrentUser()
-
-        return () => {
-            mounted = false
-        }
-    }, [dispatch])
-
-    return loading
+  return loading;
 }
 
-export default GetCurrentUser
+export default useCurrentUser;

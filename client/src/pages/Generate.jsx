@@ -3,7 +3,7 @@ import { motion } from "motion/react";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
-import { serverUrl } from "../App";
+import { serverUrl } from "../config";
 import { useDispatch, useSelector } from "react-redux";
 import { setUserData } from "../redux/userSlice";
 
@@ -108,7 +108,7 @@ function Generate() {
   }, [loading]);
 
   return (
-    <div className="min-h-screen bg-[#050505] text-white">
+    <div className="min-h-dvh bg-[#050505] text-white">
       {/* HEADER */}
 
       <div className="border-b border-white/10 bg-[#050505]/80 backdrop-blur-xl">
@@ -162,7 +162,7 @@ function Generate() {
 
           <textarea
             placeholder="Describe your idea..."
-            className="h-48 w-full resize-none rounded-2xl border border-white/10 bg-black/40 p-4 text-sm text-white outline-none transition placeholder:text-gray-600 focus:border-purple-500/50 focus:ring-2 focus:ring-purple-500/10 sm:h-52 sm:p-5 sm:text-base"
+            className="h-48 w-full resize-none rounded-2xl border border-white/10 bg-black/40 p-4 text-base text-white outline-none transition placeholder:text-gray-600 focus:border-purple-500/50 focus:ring-2 focus:ring-purple-500/10 sm:h-52 sm:p-5 sm:text-base"
             onChange={(e) => {
               setPrompt(e.target.value);
               setError("");
