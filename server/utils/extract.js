@@ -1,3 +1,5 @@
+import vm from "node:vm";
+
 const isValidHtml = (code) =>
     !!code &&
     /^\s*<!DOCTYPE html/i.test(code.trim()) &&
@@ -35,7 +37,7 @@ const extract = (text) => {
 
     const cleaned = text.replace(/```json/gi, "").replace(/```html/gi, "").replace(/```/g, "").trim();
 
-    let tagCode = cleaned.match(/<code>\s*([\s\S]*?)\s*<\/code>/i)?.[1]?.trim();
+    let tagCode = cleaned.match(/<code>\s*([\s\S]*)\s*<\/code>/i)?.[1]?.trim();
     tagCode = cleanupEscaping(tagCode);
     if (tagCode && isValidHtml(tagCode)) {
         const message =
@@ -64,6 +66,22 @@ const extract = (text) => {
         return { message: "Website generated successfully.", code: rawHtml };
     }
 
+    return null;
+};
+
+// Compiles (never runs) every inline script. One syntax error stops the whole script,
+// which is the usual reason a generated site shows up blank in the preview.
+export const checkGeneratedHtml = (html = "") => {
+    for (const m of html.matchAll(/<script\b([^>]*)>([\s\S]*?)<\/script>/gi)) {
+        if (/type\s*=\s*["']application\/(ld\+json|json)/i.test(m[1])) continue;
+        try {
+            new vm.Script(m[2]);
+        } catch (e) {
+            return `JavaScript syntax error: ${e.message}`;
+        }
+    }
+    if (/<style\b/i.test(html) && !/<\/style>/i.test(html)) return "Unclosed style tag";
+    if (/<script\b/i.test(html) && !/<\/script>/i.test(html)) return "Unclosed script tag";
     return null;
 };
 
