@@ -1,5 +1,5 @@
 import { useDeferredValue, useEffect, useRef, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import axios from "axios";
 import { serverUrl } from "../config";
 import {
@@ -11,40 +11,42 @@ import {
   X,
   Save,
   ExternalLink,
+  Smartphone,
+  ArrowLeft,
 } from "lucide-react";
 import { AnimatePresence, motion } from "motion/react";
 import { Editor } from "@monaco-editor/react";
 import { useDispatch, useSelector } from "react-redux";
 import { setUserData } from "../redux/userSlice";
 
-function Header({ title, onclose }) {
+function Header({ title, onclose, onBack }) {
   return (
-    <div className="flex items-center justify-between border-b border-white/10 px-5 py-4">
+    <div className="flex items-center justify-between border-b border-[#1D343D] px-4 py-3.5">
       <div className="flex min-w-0 items-center gap-3">
-        <div className="min-w-0">
-          <p className="text-xs text-gray-500">GenWeb.AI</p>
-
-          <h1 className="truncate text-sm font-semibold text-white">
-            {title || "Website Editor"}
-          </h1>
-        </div>
-      </div>
-
-      <div className="flex items-center gap-2">
-        <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-purple-500/10">
-          <Code2 size={16} className="text-purple-400" />
-        </div>
-
-        {onclose && (
+        {onBack && (
           <button
-            onClick={onclose}
-            aria-label="Close"
-            className="flex h-8 w-8 items-center justify-center rounded-lg text-gray-400 transition hover:bg-white/10 hover:text-white"
+            onClick={onBack}
+            aria-label="Back to dashboard"
+            className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg border border-[#1D343D] text-gray-400 transition hover:border-[#3EE8C0]/40 hover:text-white"
           >
-            <X size={17} />
+            <ArrowLeft size={17} />
           </button>
         )}
+        <div className="min-w-0">
+          <p className="text-xs text-[#6B858B]">GenWeb.AI</p>
+          <h1 className="truncate text-sm font-semibold text-white">{title || "Website editor"}</h1>
+        </div>
       </div>
+
+      {onclose && (
+        <button
+          onClick={onclose}
+          aria-label="Close"
+          className="flex h-8 w-8 items-center justify-center rounded-lg text-gray-400 transition hover:bg-white/10 hover:text-white"
+        >
+          <X size={17} />
+        </button>
+      )}
     </div>
   );
 }
@@ -61,17 +63,17 @@ function Chat({ message = [] }) {
   return (
     <div ref={ref} className="flex-1 overflow-y-auto px-4 py-5">
       <div className="mb-5 flex items-center gap-2">
-        <MessageSquare size={15} className="text-purple-400" />
+        <MessageSquare size={15} className="text-[#3EE8C0]" />
 
-        <span className="text-xs font-medium uppercase tracking-wider text-gray-500">
-          Conversation
+        <span className="text-xs font-medium text-gray-500">
+          Chat with AI
         </span>
       </div>
 
       <div className="space-y-4">
         {message.length === 0 ? (
-          <div className="rounded-xl border border-white/10 bg-white/[0.03] px-4 py-4 text-center">
-            <p className="text-xs text-gray-500">No conversation yet.</p>
+          <div className="rounded-xl border border-[#1D343D] bg-white/[0.03] px-4 py-4 text-center">
+            <p className="text-xs text-gray-500">Ask for a change, like "make the hero section bolder".</p>
           </div>
         ) : (
           message.map((m, i) => (
@@ -84,8 +86,8 @@ function Chat({ message = [] }) {
               <div
                 className={`max-w-[90%] whitespace-pre-wrap break-words rounded-2xl px-4 py-3 text-sm leading-6 ${
                   m.role === "user"
-                    ? "rounded-br-md bg-purple-600 text-white"
-                    : "rounded-bl-md border border-white/10 bg-white/[0.04] text-gray-300"
+                    ? "rounded-br-md bg-grad text-[#04201A]"
+                    : "rounded-bl-md border border-[#1D343D] bg-white/[0.04] text-gray-300"
                 }`}
               >
                 {m.content}
@@ -102,17 +104,17 @@ function ChatInput({ prompt, setPrompt, onSend, loading, step }) {
   return (
     <>
       {loading && (
-        <div className="border-t border-white/10 px-4 py-3" role="status">
+        <div className="border-t border-[#1D343D] px-4 py-3" role="status">
           <div className="flex items-center gap-2">
-            <div className="h-2 w-2 animate-pulse rounded-full bg-purple-500" />
+            <div className="h-2 w-2 animate-pulse rounded-full bg-grad" />
 
             <p className="text-xs text-gray-400">{step}</p>
           </div>
         </div>
       )}
 
-      <div className="border-t border-white/10 p-4 pb-[max(1rem,env(safe-area-inset-bottom))]">
-        <div className="flex items-center gap-2 rounded-xl border border-white/10 bg-white/[0.03] p-2 focus-within:border-purple-500/40">
+      <div className="border-t border-[#1D343D] p-4 pb-[max(1rem,env(safe-area-inset-bottom))]">
+        <div className="flex items-center gap-2 rounded-xl border border-[#1D343D] bg-white/[0.03] p-2 focus-within:border-[#3EE8C0]/50">
           <input
             type="text"
             placeholder="Describe your changes..."
@@ -133,7 +135,7 @@ function ChatInput({ prompt, setPrompt, onSend, loading, step }) {
             onClick={onSend}
             aria-label="Send"
             disabled={loading || !prompt.trim()}
-            className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-purple-600 text-white transition hover:bg-purple-500 disabled:cursor-not-allowed disabled:opacity-40"
+            className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-grad text-[#04201A] transition hover:brightness-110 disabled:cursor-not-allowed disabled:opacity-40"
           >
             <Send size={16} />
           </button>
@@ -145,6 +147,7 @@ function ChatInput({ prompt, setPrompt, onSend, loading, step }) {
 
 function WebsiteEditor() {
   const { id } = useParams();
+  const navigate = useNavigate();
 
   const dispatch = useDispatch();
 
@@ -164,6 +167,7 @@ function WebsiteEditor() {
   const [showCode, setShowCode] = useState(false);
   const [showFullPreview, setShowFullPreview] = useState(false);
   const [showChat, setShowChat] = useState(false);
+  const [device, setDevice] = useState("desktop");
 
   const [deploying, setDeploying] = useState(false);
   const [saving, setSaving] = useState(false);
@@ -258,7 +262,7 @@ function WebsiteEditor() {
     }, 1200);
 
     return () => clearInterval(i);
-  }, [updateLoading]);
+  }, [updateLoading, thinkingSteps.length]);
 
   useEffect(() => {
     const handleGetWebsite = async () => {
@@ -390,9 +394,9 @@ function WebsiteEditor() {
 
   if (error) {
     return (
-      <div className="flex min-h-dvh items-center justify-center bg-[#050505] px-6 text-white">
-        <div className="rounded-2xl border border-red-500/20 bg-red-500/10 px-6 py-5 text-center">
-          <p className="text-sm text-red-400">{error}</p>
+      <div className="flex min-h-dvh items-center justify-center bg-[#071217] px-6 text-white">
+        <div className="rounded-2xl border border-[#FF8A5B]/30 bg-[#FF8A5B]/10 px-6 py-5 text-center">
+          <p className="text-sm text-[#FFB398]">{error}</p>
         </div>
       </div>
     );
@@ -400,9 +404,9 @@ function WebsiteEditor() {
 
   if (!website) {
     return (
-      <div className="flex min-h-dvh items-center justify-center bg-[#050505] text-white">
+      <div className="flex min-h-dvh items-center justify-center bg-[#071217] text-white">
         <div className="flex flex-col items-center gap-4">
-          <div className="h-8 w-8 animate-spin rounded-full border-2 border-white/10 border-t-purple-500" />
+          <div className="h-8 w-8 animate-spin rounded-full border-2 border-[#1D343D] border-t-[#38BDF8]" />
 
           <p className="text-sm text-gray-500">
             Loading your website...
@@ -443,14 +447,14 @@ function WebsiteEditor() {
       : VP + src;
 
   return (
-    <div className="flex h-dvh overflow-hidden bg-[#050505] text-white">
+    <div className="flex h-dvh overflow-hidden bg-[#071217] text-white">
 
       {/* =====================================================
           LEFT SIDEBAR
       ====================================================== */}
 
-      <aside className="hidden w-[340px] shrink-0 flex-col border-r border-white/10 bg-[#080808] md:flex">
-        <Header title={website.title} />
+      <aside className="hidden w-[340px] shrink-0 flex-col border-r border-[#1D343D] bg-[#0A171D] md:flex">
+        <Header title={website.title} onBack={() => navigate("/dashboard")} />
 
         <Chat message={message} />
 
@@ -467,13 +471,13 @@ function WebsiteEditor() {
           RIGHT PREVIEW
       ====================================================== */}
 
-      <div className="flex min-w-0 flex-1 flex-col bg-[#111111]">
+      <div className="flex min-w-0 flex-1 flex-col bg-[#091519]">
 
         {/* ===================================================
             PREVIEW HEADER
         ==================================================== */}
 
-        <div className="flex min-h-[65px] shrink-0 items-center justify-between gap-2 border-b border-white/10 bg-[#0b0b0b] px-3 py-3 sm:px-5">
+        <div className="flex min-h-[65px] shrink-0 items-center justify-between gap-2 border-b border-[#1D343D] bg-[#0D1D24] px-3 py-3 sm:px-5">
 
           <div className="flex items-center gap-3">
 
@@ -486,11 +490,11 @@ function WebsiteEditor() {
 
             <div>
               <p className="text-sm font-medium text-white">
-                Live Preview
+                Live preview
               </p>
 
               <p className="text-xs text-gray-500">
-                Your generated website
+                Updates as you edit
               </p>
             </div>
 
@@ -498,10 +502,31 @@ function WebsiteEditor() {
 
           <div className="flex items-center gap-2">
 
+            {/* DEVICE */}
+
+            <div className="hidden items-center rounded-lg border border-[#1D343D] p-0.5 sm:flex">
+              <button
+                onClick={() => setDevice("desktop")}
+                aria-label="Desktop preview"
+                aria-pressed={device === "desktop"}
+                className={`flex h-8 w-8 items-center justify-center rounded-md transition ${device === "desktop" ? "bg-white/10 text-white" : "text-gray-500 hover:text-white"}`}
+              >
+                <Monitor size={15} />
+              </button>
+              <button
+                onClick={() => setDevice("mobile")}
+                aria-label="Mobile preview"
+                aria-pressed={device === "mobile"}
+                className={`flex h-8 w-8 items-center justify-center rounded-md transition ${device === "mobile" ? "bg-white/10 text-white" : "text-gray-500 hover:text-white"}`}
+              >
+                <Smartphone size={15} />
+              </button>
+            </div>
+
             {/* CODE */}
 
             <button
-              className="flex h-9 items-center gap-2 rounded-lg border border-white/10 bg-white/[0.03] px-2.5 text-xs font-medium text-gray-300 transition hover:border-white/20 hover:bg-white/[0.07] hover:text-white sm:px-3"
+              className="flex h-9 items-center gap-2 rounded-lg border border-[#1D343D] bg-white/[0.03] px-2.5 text-xs font-medium text-gray-300 transition hover:border-white/20 hover:bg-white/[0.07] hover:text-white sm:px-3"
               onClick={() => setShowCode(true)}
               aria-label="Open code editor"
             >
@@ -515,7 +540,7 @@ function WebsiteEditor() {
             {/* FULL PREVIEW */}
 
             <button
-              className="flex items-center gap-2 rounded-lg border border-white/10 bg-white/[0.03] px-3 py-2 text-xs font-medium text-gray-300 transition hover:border-white/20 hover:bg-white/[0.07] hover:text-white"
+              className="flex items-center gap-2 rounded-lg border border-[#1D343D] bg-white/[0.03] px-3 py-2 text-xs font-medium text-gray-300 transition hover:border-white/20 hover:bg-white/[0.07] hover:text-white"
               onClick={() => setShowFullPreview(true)}
               aria-label="Open full preview"
             >
@@ -531,7 +556,7 @@ function WebsiteEditor() {
             <button
               onClick={() => setShowChat(true)}
               aria-label="Open chat"
-              className="flex h-9 w-9 items-center justify-center rounded-lg border border-white/10 bg-white/[0.03] text-gray-400 transition hover:bg-white/[0.07] hover:text-white md:hidden"
+              className="flex h-9 w-9 items-center justify-center rounded-lg border border-[#1D343D] bg-white/[0.03] text-gray-400 transition hover:bg-white/[0.07] hover:text-white md:hidden"
             >
               <MessageSquare size={16} />
             </button>
@@ -544,7 +569,7 @@ function WebsiteEditor() {
                   href={website.deployUrl}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="flex h-9 items-center gap-1.5 rounded-lg border border-white/10 bg-white/[0.03] px-2.5 text-xs font-medium text-gray-300 transition hover:bg-white/[0.07] hover:text-white sm:px-3"
+                  className="flex h-9 items-center gap-1.5 rounded-lg border border-[#1D343D] bg-white/[0.03] px-2.5 text-xs font-medium text-gray-300 transition hover:bg-white/[0.07] hover:text-white sm:px-3"
                 >
                   <ExternalLink size={15} />
 
@@ -553,7 +578,7 @@ function WebsiteEditor() {
               )
             ) : (
               <button
-                className="flex h-9 items-center gap-1.5 rounded-lg bg-gradient-to-r from-purple-500 to-blue-500 px-2.5 text-xs font-semibold text-white shadow-lg shadow-purple-500/20 transition hover:scale-[1.02] sm:gap-2 sm:px-4"
+                className="flex h-9 items-center gap-1.5 rounded-lg bg-grad px-2.5 text-xs font-semibold text-[#04201A] transition hover:brightness-110 disabled:opacity-60 sm:gap-2 sm:px-4"
                 onClick={handleDeploy}
                 disabled={deploying}
               >
@@ -582,9 +607,9 @@ function WebsiteEditor() {
             - allow-popups enables links/window.open.
         ==================================================== */}
 
-        <div className="relative flex-1 min-h-0 bg-gray-100 p-2">
+        <div className="relative flex-1 min-h-0 bg-[#091519] p-3">
 
-          <div className="relative h-full min-h-[320px] w-full rounded-lg bg-white shadow-2xl">
+          <div className={`relative mx-auto h-full min-h-[320px] rounded-lg bg-white shadow-2xl transition-[width] duration-300 ${device === "mobile" ? "w-[390px] max-w-full" : "w-full"}`}>
 
             <iframe
               title="Website preview"
@@ -632,18 +657,18 @@ function WebsiteEditor() {
                 opacity: 0,
                 scale: 0.96,
               }}
-              className="flex h-[90dvh] w-full max-w-6xl flex-col overflow-hidden rounded-2xl border border-white/10 bg-[#0b0b0b] shadow-2xl"
+              className="flex h-[90dvh] w-full max-w-6xl flex-col overflow-hidden rounded-2xl border border-[#1D343D] bg-[#0D1D24] shadow-2xl"
             >
 
               {/* EDITOR HEADER */}
 
-              <div className="flex h-12 shrink-0 items-center justify-between border-b border-white/10 px-4">
+              <div className="flex h-12 shrink-0 items-center justify-between border-b border-[#1D343D] px-4">
 
                 <div className="flex items-center gap-2">
 
                   <Code2
                     size={15}
-                    className="text-purple-400"
+                    className="text-[#3EE8C0]"
                   />
 
                   <span className="text-sm text-gray-300">
@@ -653,7 +678,7 @@ function WebsiteEditor() {
                   <button
                     onClick={handleSave}
                     disabled={saving || !dirty}
-                    className="ml-3 flex h-8 items-center gap-1.5 rounded-lg bg-purple-600 px-3 text-xs font-medium text-white transition hover:bg-purple-500 disabled:opacity-40"
+                    className="ml-3 flex h-8 items-center gap-1.5 rounded-lg bg-grad px-3 text-xs font-semibold text-[#04201A] transition hover:brightness-110 disabled:opacity-40"
                   >
                     <Save size={14} />
 
@@ -727,13 +752,13 @@ function WebsiteEditor() {
             className="fixed inset-0 z-50 flex flex-col bg-black"
           >
 
-            <div className="flex h-14 shrink-0 items-center justify-between border-b border-white/10 bg-[#0b0b0b] px-5">
+            <div className="flex h-14 shrink-0 items-center justify-between border-b border-[#1D343D] bg-[#0D1D24] px-5">
 
               <div className="flex items-center gap-2">
 
                 <Monitor
                   size={16}
-                  className="text-purple-400"
+                  className="text-[#3EE8C0]"
                 />
 
                 <span className="text-sm font-medium text-white">
@@ -793,11 +818,12 @@ function WebsiteEditor() {
               opacity: 0,
               x: 30,
             }}
-            className="fixed inset-y-0 right-0 z-50 flex w-full flex-col overflow-hidden border-l border-white/10 bg-[#080808] shadow-2xl sm:inset-y-5 sm:right-5 sm:h-[calc(100dvh-40px)] sm:w-[380px] sm:rounded-2xl"
+            className="fixed inset-y-0 right-0 z-50 flex w-full flex-col overflow-hidden border-l border-[#1D343D] bg-[#0A171D] shadow-2xl sm:inset-y-5 sm:right-5 sm:h-[calc(100dvh-40px)] sm:w-[380px] sm:rounded-2xl"
           >
 
             <Header
               title={website.title}
+              onBack={() => navigate("/dashboard")}
               onclose={() => setShowChat(false)}
             />
 

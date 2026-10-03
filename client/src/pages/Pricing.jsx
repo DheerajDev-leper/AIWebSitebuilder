@@ -1,13 +1,13 @@
-import { Check, ArrowLeft, Sparkles } from "lucide-react";
+import { Check, ArrowLeft } from "lucide-react";
 import { motion } from "motion/react";
 import { useNavigate } from "react-router-dom";
 import { serverUrl } from "../config";
 import axios from "axios";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { setUserData } from "../redux/userSlice";
-import { useSelector } from "react-redux";
 import { useState } from "react";
-
+import Brand from "../components/Brand";
+import Aurora from "../components/Aurora";
 
 const plans = [
   {
@@ -23,7 +23,7 @@ const plans = [
       "Deploy websites",
       "Responsive websites",
     ],
-    button: "Get Started",
+    button: "Get started",
   },
   {
     name: "Pro",
@@ -64,213 +64,140 @@ const plans = [
 
 function Pricing() {
   const navigate = useNavigate();
-const dispatch = useDispatch();
-const { userData } = useSelector((state) => state.user);
-const [buyingPlan, setBuyingPlan] = useState(null);
-const [success, setSuccess] = useState("");
-const [error, setError] = useState("");
+  const dispatch = useDispatch();
+  const { userData } = useSelector((state) => state.user);
+  const [buyingPlan, setBuyingPlan] = useState(null);
+  const [success, setSuccess] = useState("");
+  const [error, setError] = useState("");
 
-const handleBuyCredits = async (plan) => {
-  if (buyingPlan) return;
-  if (!userData) { navigate("/"); return; }
-  setBuyingPlan(plan);
-  setSuccess("");
-  setError("");
+  const handleBuyCredits = async (plan) => {
+    if (buyingPlan) return;
+    if (!userData) {
+      navigate("/");
+      return;
+    }
+    setBuyingPlan(plan);
+    setSuccess("");
+    setError("");
 
-  try {
-    const result = await axios.post(
-      `${serverUrl}/api/user/add-credits`,
-      { plan },
-      { withCredentials: true }
-    );
+    try {
+      const result = await axios.post(`${serverUrl}/api/user/add-credits`, { plan }, { withCredentials: true });
 
-    // Update credits immediately in Redux
-    dispatch(
-      setUserData({
-        ...userData,
-        credits: result.data.credits,
-      })
-    );
+      // Update credits immediately in Redux
+      dispatch(setUserData({ ...userData, credits: result.data.credits }));
 
-    setSuccess(`${result.data.message}. Your balance is now ${result.data.credits} credits.`);
+      setSuccess(`${result.data.message}. Your balance is now ${result.data.credits} credits.`);
 
-    setTimeout(() => navigate("/"), 1200);
-  } catch (error) {
-    console.log(error);
-    setError(
-      error.response?.data?.message ||
-        "Failed to add credits"
-    );
-  } finally {
-    setBuyingPlan(null);
-  }
-};
+      setTimeout(() => navigate("/"), 1200);
+    } catch (error) {
+      console.log(error);
+      setError(error.response?.data?.message || "Failed to add credits");
+    } finally {
+      setBuyingPlan(null);
+    }
+  };
 
   return (
-    <div className="min-h-dvh bg-[#050505] text-white">
-      {/* Background */}
-      <div className="pointer-events-none fixed inset-0 overflow-hidden">
-        <div className="absolute left-1/2 top-[-300px] h-[600px] w-[600px] -translate-x-1/2 rounded-full bg-purple-600/20 blur-[140px]" />
-        <div className="absolute bottom-[-250px] right-[-100px] h-[500px] w-[500px] rounded-full bg-blue-600/10 blur-[140px]" />
-      </div>
+    <div className="relative isolate min-h-dvh overflow-x-hidden bg-[#071217] text-[#E9F2F1]">
+      <Aurora />
+      <div className="grid-bg pointer-events-none absolute inset-x-0 top-0 h-[560px]" />
 
-      {/* Header */}
-      <header className="relative z-10 border-b border-white/10 bg-[#050505]/70 backdrop-blur-xl">
+      <header className="relative z-10 border-b border-[#1D343D] bg-[#071217]/70 backdrop-blur-xl">
         <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-4 sm:px-6">
           <button
             onClick={() => navigate("/")}
-            className="flex items-center gap-2 text-gray-300 transition hover:text-white"
+            className="flex items-center gap-2 text-[#C5D6D8] transition hover:text-white"
           >
             <ArrowLeft size={19} />
             <span className="text-sm">Back</span>
           </button>
-
-          <div className="flex items-center gap-2">
-            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-purple-500 to-blue-500">
-              <Sparkles size={16} />
-            </div>
-
-            <span className="font-bold">GenWeb.AI</span>
-          </div>
-
+          <Brand className="text-lg" />
           <div className="w-[55px]" />
         </div>
       </header>
 
-      {/* Main */}
-      <main className="relative z-10 mx-auto max-w-6xl px-4 py-16 sm:px-6 sm:py-24">
-        {/* Heading */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="mx-auto max-w-2xl text-center"
-        >
-          <div className="mb-5 inline-flex items-center gap-2 rounded-full border border-purple-500/20 bg-purple-500/10 px-4 py-2 text-xs font-medium text-purple-300">
-            <Sparkles size={14} />
-            Simple & transparent pricing
-          </div>
-
-          <h1 className="text-4xl font-bold tracking-tight sm:text-5xl lg:text-6xl">
-            Build more.
-            <span className="block bg-gradient-to-r from-purple-400 via-purple-300 to-blue-400 bg-clip-text text-transparent">
-              Pay less.
-            </span>
+      <main className="relative z-10 mx-auto max-w-6xl px-4 py-14 sm:px-6 sm:py-20">
+        <motion.div initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }} className="max-w-2xl">
+          <h1 className="text-grad-anim pb-2 font-display text-5xl font-bold leading-[1] sm:text-6xl">
+            Pay for the credits you use.
           </h1>
-
-          <p className="mt-5 text-sm leading-6 text-gray-400 sm:text-base">
-            Choose a plan that gives you the credits and tools you need to
-            create beautiful websites with AI.
+          <p className="mt-5 max-w-xl leading-7 text-[#8AA2A8]">
+            Credits are spent when you generate or change a website. Start free and upgrade whenever you need more.
           </p>
         </motion.div>
 
         {success && (
-        <div className="relative z-10 mx-auto mt-6 max-w-2xl rounded-xl border border-emerald-500/20 bg-emerald-500/10 px-4 py-3 text-center text-sm text-emerald-300">
-          {success}
-        </div>
-      )}
+          <div role="status" className="mt-8 max-w-2xl rounded-xl border border-[#3EE8C0]/30 bg-gradient-to-br from-[#3EE8C0]/15 to-[#A78BFA]/15 px-4 py-3 text-sm text-[#7DF2D5]">
+            {success}
+          </div>
+        )}
+        {error && (
+          <div role="alert" className="mt-8 max-w-2xl rounded-xl border border-[#FF8A5B]/30 bg-[#FF8A5B]/10 px-4 py-3 text-sm text-[#FFB398]">
+            {error}
+          </div>
+        )}
 
-      {error && (
-        <div className="relative z-10 mx-auto mt-6 max-w-2xl rounded-xl border border-red-500/20 bg-red-500/10 px-4 py-3 text-center text-sm text-red-300">
-          {error}
-        </div>
-      )}
+        <div className="mt-14 grid items-stretch gap-6 md:grid-cols-3">
+          {plans.map((plan, index) => {
+            const p = !!plan.popular;
+            return (
+              <motion.div
+                key={plan.name}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: index * 0.08 }}
+                className={`lift relative flex flex-col rounded-3xl border p-6 sm:p-8 ${
+                  p ? "border-transparent bg-grad text-[#04201A] shadow-2xl shadow-[#38BDF8]/25" : "gcard"
+                }`}
+              >
+                {p && (
+                  <div className="absolute right-6 top-0 -translate-y-1/2 rounded-full bg-grad-warm px-3.5 py-1 text-xs font-semibold text-[#2A0E04]">
+                    Most popular
+                  </div>
+                )}
 
-      {/* Pricing Cards */}
-        <div className="mt-14 grid gap-6 md:grid-cols-3">
-          {plans.map((plan, index) => (
-            <motion.div
-              key={plan.name}
-              initial={{ opacity: 0, y: 30 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: index * 0.1 }}
-              className={`relative flex flex-col rounded-3xl border p-6 sm:p-8 ${
-                plan.popular
-                  ? "border-purple-500/50 bg-gradient-to-b from-purple-500/10 to-white/[0.03] shadow-2xl shadow-purple-500/10"
-                  : "border-white/10 bg-white/[0.03]"
-              }`}
-            >
-              {/* Popular */}
-              {plan.popular && (
-                <div className="absolute left-1/2 top-0 -translate-x-1/2 -translate-y-1/2 rounded-full bg-gradient-to-r from-purple-500 to-blue-500 px-4 py-1.5 text-xs font-semibold">
-                  Most Popular
-                </div>
-              )}
-
-              {/* Plan */}
-              <div>
-                <h2 className="text-xl font-semibold">{plan.name}</h2>
-
-                <p className="mt-2 min-h-[48px] text-sm leading-6 text-gray-400">
+                <h2 className="font-display text-2xl font-bold">{plan.name}</h2>
+                <p className={`mt-2 min-h-[48px] text-sm leading-6 ${p ? "text-[#04201A]/75" : "text-[#8AA2A8]"}`}>
                   {plan.description}
                 </p>
 
                 <div className="mt-6 flex items-end">
-                  <span className="text-4xl font-bold">{plan.price}</span>
-
+                  <span className="font-display text-5xl font-bold">{plan.price}</span>
                   {plan.period && (
-                    <span className="mb-1 ml-1 text-sm text-gray-500">
+                    <span className={`mb-1.5 ml-1 text-sm ${p ? "text-[#04201A]/70" : "text-[#6B858B]"}`}>
                       {plan.period}
                     </span>
                   )}
                 </div>
 
-                <div className="mt-4 rounded-xl border border-white/10 bg-white/[0.03] px-4 py-3">
-                  <p className="text-sm font-medium text-purple-300">
-                    {plan.credits}
-                  </p>
-                </div>
-              </div>
-
-              {/* Button */}
-              <button
-                onClick={() => handleBuyCredits(plan.name.toLowerCase())}
-                disabled={buyingPlan !== null}
-                className={`mt-6 w-full rounded-xl px-4 py-3 text-sm font-semibold transition ${
-                  plan.popular
-                    ? "bg-gradient-to-r from-purple-500 to-blue-500 shadow-lg shadow-purple-500/20 hover:opacity-90"
-                    : "border border-white/10 bg-white/5 hover:bg-white/10"
-                }`}
-              >
-                {buyingPlan === plan.name.toLowerCase() ? "Processing..." : plan.button}
-              </button>
-
-              {/* Features */}
-              <div className="mt-8 border-t border-white/10 pt-7">
-                <p className="mb-5 text-xs font-semibold uppercase tracking-wider text-gray-500">
-                  What's included
+                <p className={`mt-3 text-sm font-semibold ${p ? "text-[#04201A]" : "text-[#3EE8C0]"}`}>
+                  {plan.credits}
                 </p>
 
-                <div className="space-y-4">
+                <button
+                  onClick={() => handleBuyCredits(plan.name.toLowerCase())}
+                  disabled={buyingPlan !== null}
+                  className={`mt-6 w-full rounded-xl px-4 py-3 text-sm font-semibold transition disabled:cursor-not-allowed disabled:opacity-60 ${
+                    p
+                      ? "bg-[#04201A] text-[#3EE8C0] hover:bg-[#0A332A]"
+                      : "border border-[#2A4650] text-white hover:border-[#3EE8C0]/50 hover:bg-white/5"
+                  }`}
+                >
+                  {buyingPlan === plan.name.toLowerCase() ? "Processing..." : plan.button}
+                </button>
+
+                <ul className={`mt-8 space-y-3.5 border-t pt-7 ${p ? "border-[#04201A]/20" : "border-[#1D343D]"}`}>
                   {plan.features.map((feature) => (
-                    <div
-                      key={feature}
-                      className="flex items-start gap-3 text-sm text-gray-300"
-                    >
-                      <div className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-purple-500/10">
-                        <Check size={13} className="text-purple-400" />
-                      </div>
-
+                    <li key={feature} className={`flex items-start gap-3 text-sm ${p ? "" : "text-[#C5D6D8]"}`}>
+                      <Check size={16} strokeWidth={3} className={`mt-0.5 shrink-0 ${p ? "text-[#04201A]" : "text-[#3EE8C0]"}`} />
                       <span>{feature}</span>
-                    </div>
+                    </li>
                   ))}
-                </div>
-              </div>
-            </motion.div>
-          ))}
+                </ul>
+              </motion.div>
+            );
+          })}
         </div>
-
-        {/* Bottom */}
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.4 }}
-          className="mx-auto mt-14 max-w-2xl text-center"
-        >
-          <p className="text-xs leading-5 text-gray-500">
-            Credits are used when generating or modifying websites. You can
-            upgrade your plan whenever you need more.
-          </p>
-        </motion.div>
       </main>
     </div>
   );
