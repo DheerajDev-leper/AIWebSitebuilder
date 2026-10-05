@@ -110,7 +110,7 @@ function Home() {
 
       {/* Navbar */}
       <nav className="relative z-20 mx-auto flex max-w-7xl items-center justify-between px-5 py-5 lg:px-10">
-        <button onClick={() => navigate("/")} aria-label="GenWeb.AI home">
+        <button onClick={() => navigate("/")} aria-label="SiteNova home">
           <Brand />
         </button>
 
@@ -201,7 +201,7 @@ function Home() {
           </h1>
 
           <p style={{ animationDelay: "0.2s" }} className="rise mt-7 max-w-xl text-base leading-7 text-[#8AA2A8] sm:text-lg">
-            Tell GenWeb.AI about your business in a few sentences. It writes the code, shows a live preview,
+            Tell SiteNova about your business in a few sentences. It writes the code, shows a live preview,
             and publishes when you're ready.
           </p>
 
@@ -263,7 +263,7 @@ function Home() {
       <footer className="relative z-10 border-t border-[#1D343D] px-5 py-8">
         <div className="mx-auto flex max-w-7xl flex-col items-center justify-between gap-4 sm:flex-row">
           <Brand className="text-lg" />
-          <p className="text-sm text-[#6B858B]">© {new Date().getFullYear()} GenWeb.AI. All rights reserved.</p>
+          <p className="text-sm text-[#6B858B]">© {new Date().getFullYear()} SiteNova. All rights reserved.</p>
           <div className="flex gap-5 text-sm text-[#8AA2A8]">
             <span className="cursor-pointer transition hover:text-white">Privacy</span>
             <span className="cursor-pointer transition hover:text-white">Terms</span>

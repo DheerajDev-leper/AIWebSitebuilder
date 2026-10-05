@@ -33,7 +33,7 @@ function Header({ title, onclose, onBack }) {
           </button>
         )}
         <div className="min-w-0">
-          <p className="text-xs text-[#6B858B]">GenWeb.AI</p>
+          <p className="text-xs text-[#6B858B]">SiteNova</p>
           <h1 className="truncate text-sm font-semibold text-white">{title || "Website editor"}</h1>
         </div>
       </div>

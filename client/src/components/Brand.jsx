@@ -7,7 +7,7 @@ function Brand({ className = "" }) {
         <Sparkles size={15} strokeWidth={2.5} />
       </span>
       <span>
-        GenWeb<span className="text-grad-anim">.AI</span>
+        Site<span className="text-grad-anim">Nova</span>
       </span>
     </span>
   );

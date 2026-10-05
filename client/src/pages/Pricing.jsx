@@ -13,7 +13,7 @@ const plans = [
   {
     name: "Free",
     price: "₹0",
-    description: "Try GenWeb.AI and build your first websites.",
+    description: "Try SiteNova and build your first websites.",
     credits: "100 credits",
     features: [
       "AI website generation",

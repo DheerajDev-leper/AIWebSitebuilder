@@ -34,7 +34,7 @@ const callModel = async (model, messages, maxTokens) => {
   const headers = {
     Authorization: `Bearer ${process.env.OPENROUTER_API_KEY}`,
     "Content-Type": "application/json",
-    "X-Title": "GenWeb.AI",
+    "X-Title": "SiteNova",
   };
   const referer = (process.env.CLIENT_URL || "").split(",")[0].trim();
   if (referer) headers["HTTP-Referer"] = referer;
